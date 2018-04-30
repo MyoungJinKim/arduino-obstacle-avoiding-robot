@@ -126,9 +126,6 @@ void setup() {
   servo.attach(SERVO_PWM);
   servo.write(SERVO_FRONT);
   delay(SERVO_DELAY);
-
-  // drive forward
-  drive(MOTOR_DRIVE_PWM, MOTOR_DRIVE_PWM);
 }
 
 #define AVOIDING_DISTANCE 20
@@ -143,23 +140,29 @@ void loop() {
     servo.write(SERVO_LEFT);
     delay(SERVO_DELAY);
     int leftDistance = getDistance();
+    delay(SONAR_DELAY);
     // look right
     servo.write(SERVO_RIGHT);
     delay(SERVO_DELAY);
     int rightDistance = getDistance();
+    delay(SONAR_DELAY);
     // make servo face front
     servo.write(SERVO_FRONT);
     delay(SERVO_DELAY);
     
     // turn according to the distance to obstacles
-    if (leftDistance < rightDistance) {
+    if (leftDistance < distance && rightDistance < distance) {
+      drive(MOTOR_DRIVE_PWM, -MOTOR_DRIVE_PWM);
+      delay(1000);
+    } else if (leftDistance < rightDistance) {
       // turn right
       drive(-MOTOR_DRIVE_PWM, MOTOR_DRIVE_PWM);
+      delay(MOTOR_TURN_DELAY);
     } else {
       // turn left
       drive(MOTOR_DRIVE_PWM, -MOTOR_DRIVE_PWM);
+      delay(MOTOR_TURN_DELAY);
     }
-    delay(MOTOR_TURN_DELAY);
     drive(0, 0);
   } else {
     // delay for ultra-sonic sensor
